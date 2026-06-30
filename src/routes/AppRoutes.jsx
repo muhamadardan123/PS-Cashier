@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
-// 🔥 Dynamic Import dengan Lazy Loading
-const Login = lazy(() => import("../pages/Login/Login"));
-const Dashboard = lazy(() => import("../pages/Dashboard/Dashboard"));
+// 🔥 PERHATIKAN PERBEDAAN HURUF BESAR/KECILNYA!
+const Login = lazy(() => import("../pages/login/Login"));          // ✅ login (huruf kecil)
+const Dashboard = lazy(() => import("../pages/dashboard/Dashboard")); // ✅ dashboard (huruf kecil)
 const Analytics = lazy(() => import("../pages/analytics/Analytics"));
 const Layout = lazy(() => import("../components/layout/Layout"));
-const TransaksiPs = lazy(() => import("../pages/transaksiPS/TransaksiPs"));
+const TransaksiPs = lazy(() => import("../pages/transaksiPS/TransaksiPS")); // ✅ TransaksiPS (S besar)
 const TransaksiSnack = lazy(() => import("../pages/transaksisnack/TransaksiSnack"));
 const Stock = lazy(() => import("../pages/stock/Stock"));
 
@@ -98,13 +98,8 @@ export default function AppRoutes() {
     >
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* Redirect awal */}
           <Route path="/" element={<Navigate to="/login" replace />} />
-
-          {/* Auth (Halaman login berdiri sendiri, tanpa sidebar) */}
           <Route path="/login" element={<Login />} />
-
-          {/* Rute Utama yang dibungkus oleh Layout (Akan memiliki Sidebar) */}
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/analytics" element={<Analytics />} />
@@ -112,8 +107,6 @@ export default function AppRoutes() {
             <Route path="/transaksi-snack" element={<TransaksiSnack />} />
             <Route path="/stock" element={<Stock />} />
           </Route>
-
-          {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
