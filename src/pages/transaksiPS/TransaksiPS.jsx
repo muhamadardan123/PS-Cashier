@@ -12,7 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import "./TransaksiPs.css";
+import "./TransaksiPS.css";
 
 const PRICE_PER_HOUR = 15000;
 const ITEMS_PER_PAGE = 5;
