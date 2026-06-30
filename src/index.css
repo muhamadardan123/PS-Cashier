@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tetapkan background default jika diperlukan */
+body {
+  @apply bg-slate-50 text-slate-800 antialiased;
+}

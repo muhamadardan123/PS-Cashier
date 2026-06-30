@@ -1,0 +1,56 @@
+/* ==========================================================================
+   PS CASHIER - GLOBAL STYLES
+   ========================================================================== */
+
+/* ROOT */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* BODY */
+body {
+  @apply bg-slate-100 text-slate-800 antialiased;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* INPUT NUMBER FIX */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+}
+
+/* GLOBAL UTILITIES */
+.btn-active-effect {
+  @apply active:scale-95 transition-transform duration-100;
+}
+
+.no-select {
+  @apply select-none;
+}

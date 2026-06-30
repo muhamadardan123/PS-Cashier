@@ -1,0 +1,196 @@
+/* --- CSS RESET & GLOBAL OVERRIDES --- */
+/* Menghapus margin bawaan browser dan mengunci warna latar belakang global */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #060913; /* Hitam kebiruan pekat */
+  overflow: hidden;
+}
+
+/* --- MAIN CONTAINER --- */
+.login-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #060913;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* --- AMBIENT GLOW LIGHTS --- */
+/* Membuat pendaran cahaya samar di background */
+.glow-bg {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-1 {
+  width: 450px;
+  height: 450px;
+  background: #3b82f6; /* Bias Biru */
+  top: 15%;
+  left: -10%;
+}
+
+.glow-2 {
+  width: 550px;
+  height: 550px;
+  background: #1e3a8a; /* Bias Biru Tua */
+  bottom: -15%;
+  right: -5%;
+}
+
+.glow-3 {
+  width: 350px;
+  height: 350px;
+  background: #8b5cf6; /* Bias Ungu */
+  top: 35%;
+  right: 15%;
+}
+
+/* --- GLASSMORPHISM CARD --- */
+.glass-card {
+  width: 380px; /* Ukuran proporsional sesuai gambar referensi */
+  padding: 40px;
+  border-radius: 24px;
+  text-align: center;
+  z-index: 10;
+
+  /* Efek Kaca Transparan Blur */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  
+  /* Border Halus Berkilau */
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6),
+              inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* --- BRANDING & HEADER --- */
+.icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.game-icon {
+  color: #5c7fff;
+  filter: drop-shadow(0 0 15px rgba(92, 127, 255, 0.4));
+}
+
+.glass-card h2 {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  margin: 0 0 8px 0;
+}
+
+.glass-card .subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 36px 0;
+}
+
+/* --- INPUT GROUPS & FIELDS --- */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  color: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+
+.glass-card input {
+  width: 100%;
+  padding: 14px 16px 14px 48px; /* Memberikan ruang ekstra di kiri untuk ikon */
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.glass-card input:focus {
+  border-color: rgba(92, 127, 255, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 0 3px rgba(92, 127, 255, 0.15);
+}
+
+.glass-card input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- TOGGLE EYE BUTTON --- */
+.eye-icon-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.eye-icon-btn:hover {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* --- GRADIENT LOGIN BUTTON --- */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  
+  /* Gradasi warna biru cerah ke ungu elektrik sesuai gambar */
+  background: linear-gradient(90deg, #4475f7 0%, #7c4dff 100%);
+  box-shadow: 0 4px 25px rgba(68, 117, 247, 0.25);
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover:not(:disabled) {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(124, 77, 255, 0.35);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.login-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,320 @@
+/* ==========================================================================
+   SIDEBAR - RESPONSIVE GLASSMORPHISM (Mobile First) - TANPA TOPBAR
+   ========================================================================== */
+
+/* ==========================================================================
+   MOBILE (0 - 767px) - Horizontal Bottom Navigation
+   ========================================================================== */
+
+.sidebar-glass {
+  width: 100%;
+  height: 64px;
+  background: rgba(10, 10, 20, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 8px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: auto;
+  border-radius: 0;
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 1000;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-glass::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==========================================================================
+   BRAND LOGO - Mobile (Disembunyikan)
+   ========================================================================== */
+
+.sidebar-brand {
+  display: none;
+}
+
+/* ==========================================================================
+   MENU CONTAINER - Mobile (Horizontal Scroll)
+   ========================================================================== */
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  flex: 1;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==========================================================================
+   MENU ITEM - Mobile
+   ========================================================================== */
+
+.menu-item {
+  text-decoration: none;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 4px 8px;
+  min-width: 48px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.4rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.menu-item svg {
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.45);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.menu-item span {
+  font-size: 0.35rem;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   MENU ITEM - Active di Mobile (Garis Bawah)
+   ========================================================================== */
+
+.menu-item.active {
+  color: #00f2fe;
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+}
+
+.menu-item.active svg {
+  color: #00f2fe;
+  filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.6));
+}
+
+.menu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 25%;
+  top: auto;
+  bottom: -2px;
+  height: 2px;
+  width: 50%;
+  background: #00f2fe;
+  box-shadow: 0 0 12px #00f2fe;
+  border-radius: 4px 4px 0 0;
+}
+
+/* ==========================================================================
+   FOOTER - Mobile (Disembunyikan)
+   ========================================================================== */
+
+.sidebar-footer {
+  display: none;
+}
+
+/* ==========================================================================
+   TABLET (768px - 1023px) - Vertical Sidebar Kecil
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .sidebar-glass {
+    width: 90px;
+    height: auto;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    bottom: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 100;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  /* Tampilkan Brand */
+  .sidebar-brand {
+    display: block;
+    margin-bottom: 24px;
+  }
+
+  .brand-icon-neon {
+    color: #00f2fe;
+    filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.6));
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Menu Vertical */
+  .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+  }
+
+  .menu-item {
+    padding: 8px 0;
+    min-width: unset;
+    font-size: 0.5rem;
+    letter-spacing: 0.4px;
+    gap: 4px;
+  }
+
+  .menu-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .menu-item span {
+    font-size: 0.45rem;
+  }
+
+  /* Active indicator - Garis Samping Kiri */
+  .menu-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15%;
+    height: 70%;
+    width: 3px;
+    background: #00f2fe;
+    box-shadow: 0 0 12px #00f2fe;
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* Tampilkan Footer */
+  .sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: auto;
+  }
+
+  .sidebar-logout-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-logout-btn:hover {
+    color: #ff4b5c;
+    background: rgba(255, 75, 92, 0.1);
+    filter: drop-shadow(0 0 8px rgba(255, 75, 92, 0.4));
+  }
+
+  .sidebar-logout-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .version-text {
+    font-size: 0.45rem;
+    color: rgba(255, 255, 255, 0.2);
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+}
+
+/* ==========================================================================
+   DESKTOP (1024px+) - Sidebar Penuh
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  .sidebar-glass {
+    width: 110px;
+    top: 25px;
+    left: 25px;
+    bottom: 25px;
+    padding: 30px 0;
+  }
+
+  .sidebar-brand {
+    margin-bottom: 30px;
+  }
+
+  .brand-icon-neon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar-menu {
+    gap: 8px;
+  }
+
+  .menu-item {
+    padding: 10px 0;
+    font-size: 0.55rem;
+    letter-spacing: 0.5px;
+    gap: 6px;
+  }
+
+  .menu-item svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .menu-item span {
+    font-size: 0.55rem;
+  }
+
+  .sidebar-footer {
+    gap: 12px;
+  }
+
+  .sidebar-logout-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .version-text {
+    font-size: 0.5rem;
+  }
+}
