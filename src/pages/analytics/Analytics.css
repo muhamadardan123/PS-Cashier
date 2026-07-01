@@ -88,6 +88,191 @@
   flex-wrap: wrap;
 }
 
+/* ── MONTH PICKER ── */
+.month-picker {
+  position: relative;
+  display: inline-block;
+}
+
+.month-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #dbe7ff;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.month-picker-trigger:hover,
+.month-picker-trigger:focus {
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.08);
+}
+
+.month-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  width: 280px;
+  background: rgba(18, 20, 40, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: mpFadeIn 0.18s ease;
+}
+
+@keyframes mpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.month-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.month-picker-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #aabbcc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.month-picker-nav:hover {
+  background: rgba(0, 212, 255, 0.12);
+  color: #00d4ff;
+}
+
+.month-picker-year-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 6px 28px 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #e0e4f0;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aabbcc' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.month-picker-year-select:focus {
+  border-color: rgba(0, 212, 255, 0.4);
+}
+
+.month-picker-year-select option {
+  background: #131525;
+  color: #e0e4f0;
+}
+
+.month-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.month-picker-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(220, 230, 250, 0.85);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.month-picker-cell:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.month-picker-cell.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+.month-picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.month-picker-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.month-picker-btn.text {
+  background: transparent;
+  color: #ef4444;
+}
+
+.month-picker-btn.text:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.month-picker-btn.primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+}
+
+.month-picker-btn.primary:hover {
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
 /* ── CONTROLS ── */
 .glass-select {
   appearance: none;
@@ -463,8 +648,15 @@
     align-items: stretch;
   }
 
-  .glass-select,
+  .month-picker,
+  .month-picker-trigger,
   .export-btn {
+    width: 100%;
+  }
+
+  .month-picker-dropdown {
+    left: 0;
+    right: 0;
     width: 100%;
   }
 

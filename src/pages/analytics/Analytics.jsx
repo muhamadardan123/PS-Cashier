@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -8,7 +8,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import ExcelJS from "exceljs";
 import "./Analytics.css";
@@ -16,6 +16,11 @@ import "./Analytics.css";
 // ═════════════════════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ═════════════════════════════════════════════════════════════════════════════
+
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+  "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+];
 
 const formatDateExcel = (iso) => {
   if (!iso) return "-";
@@ -99,10 +104,157 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // ═════════════════════════════════════════════════════════════════════════════
+// MONTH PICKER COMPONENT
+// ═════════════════════════════════════════════════════════════════════════════
+function MonthPicker({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [viewYear, setViewYear] = useState(() => {
+    const [y] = value.split("-").map(Number);
+    return y;
+  });
+  const containerRef = useRef(null);
+
+  const [selectedYear, selectedMonth] = value.split("-").map(Number);
+
+  // Close on click outside
+  useEffect(() => {
+    if (!open) return;
+    const handleClick = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  // Sync viewYear when value changes from outside
+  useEffect(() => {
+    const [y] = value.split("-").map(Number);
+    setViewYear(y);
+  }, [value]);
+
+  const handleSelect = (monthIndex) => {
+    const monthStr = String(monthIndex + 1).padStart(2, "0");
+    onChange(`${viewYear}-${monthStr}`);
+    setOpen(false);
+  };
+
+  const handleThisMonth = () => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    onChange(`${y}-${m}`);
+    setViewYear(y);
+    setOpen(false);
+  };
+
+  const handleClear = () => {
+    // Reset ke bulan ini
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    onChange(`${y}-${m}`);
+    setViewYear(y);
+    setOpen(false);
+  };
+
+  const yearOptions = [];
+  const currentYear = new Date().getFullYear();
+  for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+    yearOptions.push(y);
+  }
+
+  const displayLabel = getMonthLabel(value);
+
+  return (
+    <div className="month-picker" ref={containerRef}>
+      <button
+        className="month-picker-trigger"
+        onClick={() => setOpen((v) => !v)}
+        type="button"
+      >
+        <Calendar size={16} />
+        <span>{displayLabel}</span>
+      </button>
+
+      {open && (
+        <div className="month-picker-dropdown">
+          {/* Year selector */}
+          <div className="month-picker-header">
+            <button
+              className="month-picker-nav"
+              onClick={() => setViewYear((y) => y - 1)}
+              type="button"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <select
+              className="month-picker-year-select"
+              value={viewYear}
+              onChange={(e) => setViewYear(Number(e.target.value))}
+            >
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+            <button
+              className="month-picker-nav"
+              onClick={() => setViewYear((y) => y + 1)}
+              type="button"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+
+          {/* Month grid */}
+          <div className="month-picker-grid">
+            {MONTH_NAMES.map((name, idx) => {
+              const isSelected =
+                idx + 1 === selectedMonth && viewYear === selectedYear;
+              return (
+                <button
+                  key={name}
+                  className={`month-picker-cell${isSelected ? " active" : ""}`}
+                  onClick={() => handleSelect(idx)}
+                  type="button"
+                >
+                  {name}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Footer */}
+          <div className="month-picker-footer">
+            <button className="month-picker-btn text" onClick={handleClear} type="button">
+              Hapus
+            </button>
+            <button className="month-picker-btn primary" onClick={handleThisMonth} type="button">
+              Bulan ini
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═════════════════════════════════════════════════════════════════════════════
 export default function Analytics() {
-  const [month, setMonth] = useState("2026-06");
+  // Default ke bulan & tahun saat ini
+  const getCurrentYearMonth = () => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    return `${y}-${m}`;
+  };
+
+  const [month, setMonth] = useState(getCurrentYearMonth);
   const [psTransactions, setPsTransactions] = useState([]);
   const [snackTransactions, setSnackTransactions] = useState([]);
   const [stockItems, setStockItems] = useState([]);
@@ -383,16 +535,12 @@ export default function Analytics() {
         cell.style = normalStyle;
       });
 
-      // Format kolom
-      row.getCell(4).numFmt = '"Rp"#,##0'; // Harga Jual - dengan Rp
-      row.getCell(5).numFmt = '#,##0'; // 🔥 Stok Tersedia - TANPA Rp
-      row.getCell(6).numFmt = '"Rp"#,##0'; // Total Nilai Stok - dengan Rp
-      
-      // 🔥 Pastikan nilai di kolom Stok Tersedia adalah number
+      row.getCell(4).numFmt = '"Rp"#,##0';
+      row.getCell(5).numFmt = '#,##0';
+      row.getCell(6).numFmt = '"Rp"#,##0';
       row.getCell(5).value = quantity;
     });
 
-    // ── Row Total ──
     if (stockItems.length > 0) {
       const totalRow = wsStock.addRow([
         "",
@@ -406,8 +554,8 @@ export default function Analytics() {
       totalRow.eachCell((cell) => {
         cell.style = totalStyle;
       });
-      totalRow.getCell(5).numFmt = '#,##0'; // 🔥 Total Items - TANPA Rp
-      totalRow.getCell(6).numFmt = '"Rp"#,##0'; // Total Nilai Stok - dengan Rp
+      totalRow.getCell(5).numFmt = '#,##0';
+      totalRow.getCell(6).numFmt = '"Rp"#,##0';
     }
 
     wsStock.columns = [
@@ -454,15 +602,7 @@ export default function Analytics() {
           </div>
 
           <div className="analytics-actions">
-            <select
-              className="glass-select"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-            >
-              <option value="2026-06">Juni 2026</option>
-              <option value="2026-07">Juli 2026</option>
-              <option value="2026-08">Agustus 2026</option>
-            </select>
+            <MonthPicker value={month} onChange={setMonth} />
 
             <button className="export-btn" onClick={exportToExcel}>
               <FileSpreadsheet size={16} />
