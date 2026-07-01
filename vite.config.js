@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  base: '/', // ⬅️ TAMBAHKAN INI (penting untuk deployment root domain)
   build: {
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
