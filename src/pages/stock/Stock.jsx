@@ -23,11 +23,13 @@ export default function Stock() {
   const [formData, setFormData] = useState({
     snack_name: "",
     price: "",
+    harga_modal: "",
     quantity: "",
   });
 
   // State untuk display format Rupiah (dengan titik)
   const [displayPrice, setDisplayPrice] = useState("");
+  const [displayCostPrice, setDisplayCostPrice] = useState("");
 
   // ── Fetch Data ──
   const fetchData = useCallback(async () => {
@@ -99,6 +101,14 @@ export default function Stock() {
     setDisplayPrice(rawValue === "" ? "" : formatNumber(numericValue));
   };
 
+  const handleCostPriceInput = (e) => {
+    const rawValue = e.target.value.replace(/[^0-9]/g, "");
+    const numericValue = rawValue === "" ? "" : parseInt(rawValue, 10);
+    
+    setFormData((prev) => ({ ...prev, harga_modal: numericValue }));
+    setDisplayCostPrice(rawValue === "" ? "" : formatNumber(numericValue));
+  };
+
   // ── Form Handlers ──
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -117,11 +127,14 @@ export default function Stock() {
           .from("stocks")
           .update({
             quantity: quantity,
+            harga_modal: costPrice,
             updated_at: new Date().toISOString(),
           })
           .eq("id", editingId);
 
         if (stockError) throw stockError;
+
+        const costPrice = parseInt(formData.harga_modal) || 0;
 
         // Update harga snack juga
         const stockItem = stockItems.find((s) => s.id === editingId);
@@ -173,6 +186,7 @@ export default function Stock() {
         const { error: insertStockError } = await supabase.from("stocks").insert({
           snack_id: snackId,
           quantity: quantity,
+          harga_modal: parseInt(formData.harga_modal) || 0,
         });
 
         if (insertStockError) throw insertStockError;
@@ -189,12 +203,15 @@ export default function Stock() {
   const handleEdit = (item) => {
     setEditingId(item.id);
     const itemPrice = item.snacks?.price || "";
+    const itemCostPrice = item.harga_modal || "";
     setFormData({
       snack_name: item.snacks?.name || "",
       price: itemPrice,
+      harga_modal: itemCostPrice,
       quantity: item.quantity || "",
     });
     setDisplayPrice(itemPrice === "" ? "" : formatNumber(itemPrice));
+    setDisplayCostPrice(itemCostPrice === "" ? "" : formatNumber(itemCostPrice));
     setShowModal(true);
   };
 
@@ -215,9 +232,11 @@ export default function Stock() {
     setFormData({
       snack_name: "",
       price: "",
+      harga_modal: "",
       quantity: "",
     });
     setDisplayPrice("");
+    setDisplayCostPrice("");
     setEditingId(null);
     setShowModal(false);
   };
@@ -300,6 +319,7 @@ export default function Stock() {
             <tr>
               <th>No</th>
               <th>Nama Snack</th>
+              <th>Harga Modal</th>
               <th>Harga Jual</th>
               <th>Stok</th>
               <th>Status</th>
@@ -310,7 +330,7 @@ export default function Stock() {
           <tbody>
             {filteredStock.length === 0 ? (
               <tr>
-                <td colSpan="7" className="empty-state">
+                <td colSpan="8" className="empty-state">
                   {searchQuery
                     ? "Tidak ada snack yang cocok dengan pencarian"
                     : "Belum ada data stok. Klik 'Tambah Stok' untuk menambahkan."}
@@ -328,6 +348,7 @@ export default function Stock() {
                     <td>
                       <div className="item-name">{snack.name || "-"}</div>
                     </td>
+                    <td>{formatRupiah(item.harga_modal)}</td>
                     <td>{formatRupiah(snack.price)}</td>
                     <td>
                       <span className={`stock-count ${isLow ? "low" : ""}`}>
@@ -400,6 +421,21 @@ export default function Stock() {
 
               <div className="form-row">
                 <div className="form-group">
+                  <label>Harga Modal</label>
+                  <div className="input-rupiah">
+                    <span className="rupiah-prefix">Rp</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={displayCostPrice}
+                      onChange={handleCostPriceInput}
+                      placeholder="0"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
                   <label>Harga Jual</label>
                   <div className="input-rupiah">
                     <span className="rupiah-prefix">Rp</span>
@@ -413,7 +449,9 @@ export default function Stock() {
                     />
                   </div>
                 </div>
+              </div>
 
+              <div className="form-row">
                 <div className="form-group">
                   <label>Jumlah Stok</label>
                   <input
