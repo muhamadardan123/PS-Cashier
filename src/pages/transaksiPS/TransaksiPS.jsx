@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useCallback } from "react";
+import { toast } from "react-hot-toast";
 import { supabase } from "../../lib/supabase";
 import {
   Gamepad2,
@@ -180,10 +181,10 @@ export default function TransaksiPs() {
       localStorage.setItem('dashboardNeedRefresh', 'true');
       window.dispatchEvent(new CustomEvent('refreshDashboard'));
       
-      alert("✅ Transaksi berhasil ditandai lunas!");
+      toast.success("Transaksi berhasil ditandai lunas!");
 
     } catch (error) {
-      alert("❌ Gagal mengubah status: " + error.message);
+      toast.error("Gagal mengubah status: " + error.message);
     } finally {
       setMarkingPaid(null);
     }
@@ -293,12 +294,12 @@ export default function TransaksiPs() {
     e.preventDefault();
 
     if (!form.customer.trim()) {
-      alert("Nama pelanggan wajib diisi.");
+      toast.error("Nama pelanggan wajib diisi.");
       return;
     }
 
     if (form.amount === "" || Number(form.amount) <= 0) {
-      alert("Amount wajib diisi.");
+      toast.error("Amount wajib diisi.");
       return;
     }
 
@@ -307,7 +308,7 @@ export default function TransaksiPs() {
       form.openPlayMode === "Masuk Manual"
     ) {
       if (!form.manualTime || !isValidTimeFormat(form.manualTime)) {
-        alert("Format jam manual harus hh.mm.ss, contoh 02.30.00");
+        toast.error("Format jam manual harus hh.mm.ss, contoh 02.30.00");
         return;
       }
     }
@@ -367,9 +368,9 @@ export default function TransaksiPs() {
       localStorage.setItem('dashboardNeedRefresh', 'true');
       window.dispatchEvent(new CustomEvent('refreshDashboard'));
       
-      alert("Transaksi berhasil disimpan!");
+      toast.success("Transaksi berhasil disimpan!");
     } catch (error) {
-      alert("Gagal menyimpan transaksi: " + error.message);
+      toast.error("Gagal menyimpan transaksi: " + error.message);
     }
   };
 

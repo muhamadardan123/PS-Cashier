@@ -27,14 +27,6 @@ export default function Sidebar({ handleLogout }) {
         </NavLink>
 
         <NavLink
-          to="/analytics"
-          className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}
-        >
-          <TrendingUp size={22} />
-          <span>ANALYTICS</span>
-        </NavLink>
-
-        <NavLink
           to="/transaksi-ps"
           className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}
         >
@@ -56,6 +48,14 @@ export default function Sidebar({ handleLogout }) {
         >
           <Package size={22} />
           <span>STOCK</span>
+        </NavLink>
+
+        <NavLink
+          to="/analytics"
+          className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}
+        >
+          <TrendingUp size={22} />
+          <span>ANALYTICS</span>
         </NavLink>
 
         {/* Menu Settings telah dihapus */}

@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useCallback } from "react";
+import { toast } from "react-hot-toast";
 import { supabase } from "../../lib/supabase";
 import {
   ShoppingBag,
@@ -221,7 +222,7 @@ export default function TransaksiSnack() {
     e.preventDefault();
 
     if (!form.itemName.trim() || !form.price) {
-      alert("Nama item dan harga wajib diisi!");
+      toast.error("Nama item dan harga wajib diisi!");
       return;
     }
 
@@ -232,13 +233,13 @@ export default function TransaksiSnack() {
 
     // Cek stok habis
     if (!stockStatus.exists || stockStatus.qty <= 0) {
-      alert(`❌ Stok "${form.itemName}" habis! Tidak bisa melakukan transaksi.\n\nSilakan tambah stok di halaman Stock Management.`);
+      toast.error(`Stok "${form.itemName}" habis! Tidak bisa melakukan transaksi.\n\nSilakan tambah stok di halaman Stock Management.`);
       return;
     }
 
     // Cek stok cukup
     if (stockStatus.qty < form.quantity) {
-      alert(`❌ Stok tidak cukup!\nTersedia: ${stockStatus.qty} item\nDibutuhkan: ${form.quantity} item\n\nSilakan tambah stok di halaman Stock Management.`);
+      toast.error(`Stok tidak cukup!\nTersedia: ${stockStatus.qty} item\nDibutuhkan: ${form.quantity} item\n\nSilakan tambah stok.`);
       return;
     }
 
@@ -275,7 +276,7 @@ export default function TransaksiSnack() {
 
         if (stockError) {
           console.error("Error updating stock:", stockError);
-          alert("⚠️ Transaksi tersimpan, tetapi gagal mengurangi stok. Silakan update stok manual.");
+          toast.error("⚠️ Transaksi tersimpan, tetapi gagal mengurangi stok. Silakan update stok manual.");
         } else {
           console.log("[DEBUG] Stock updated successfully");
         }
@@ -298,10 +299,10 @@ export default function TransaksiSnack() {
       localStorage.setItem('dashboardNeedRefresh', 'true');
       window.dispatchEvent(new CustomEvent('refreshDashboard'));
       
-      alert("✅ Penjualan berhasil disimpan! Stok telah dikurangi.");
+      toast.success("Penjualan berhasil disimpan! Stok telah dikurangi.");
     } catch (error) {
       console.error("Submit error:", error);
-      alert("❌ Gagal menyimpan penjualan: " + error.message);
+      toast.error("Gagal menyimpan penjualan: " + error.message);
     }
   };
 

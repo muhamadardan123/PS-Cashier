@@ -3,6 +3,8 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -87,6 +89,30 @@ const groupByWeek = (transactions, yearMonth) => {
 
     return { name: week.name, value: weekTotal };
   });
+};
+
+const groupByDay = (transactions, yearMonth) => {
+  const [year, month] = yearMonth.split("-").map(Number);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const days = [];
+  const monthName = MONTH_NAMES[month - 1];
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    days.push({ name: `${i} ${monthName}`, value: 0 });
+  }
+
+  transactions.forEach((t) => {
+    const tDate = new Date(t.created_at);
+    const tDay = tDate.getDate();
+    const tMonth = tDate.getMonth() + 1;
+    const tYear = tDate.getFullYear();
+
+    if (tYear === year && tMonth === month) {
+      days[tDay - 1].value += (t.total_price || 0);
+    }
+  });
+
+  return days;
 };
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -317,8 +343,18 @@ export default function Analytics() {
     [psTransactions, month]
   );
 
+  const psDailyChartData = useMemo(
+    () => groupByDay(psTransactions, month),
+    [psTransactions, month]
+  );
+
   const snackChartData = useMemo(
     () => groupByWeek(snackTransactions, month),
+    [snackTransactions, month]
+  );
+
+  const snackDailyChartData = useMemo(
+    () => groupByDay(snackTransactions, month),
     [snackTransactions, month]
   );
 
@@ -443,28 +479,47 @@ export default function Analytics() {
       "Tanggal",
       "Nama Item",
       "Jumlah",
-      "Harga Satuan",
+      "Harga Modal (Sat)",
+      "Harga Jual (Sat)",
       "Total Harga",
+      "Keuntungan",
     ];
     wsSnack.addRow(snackHeaders);
     wsSnack.getRow(1).eachCell((cell) => {
       cell.style = headerStyle;
     });
 
+    let totalSnackProfit = 0;
+
     snackTransactions.forEach((t, index) => {
+      const stockItem = stockItems.find((s) => s.snacks?.name === t.snack_name);
+      const modalSatuan = Number(stockItem?.harga_modal || 0);
+      const qty = Number(t.quantity || 0);
+      const jualSatuan = Number(t.price || 0);
+      const totalJual = Number(t.total_price || 0);
+      const totalModal = modalSatuan * qty;
+      const profit = totalJual - totalModal;
+
+      totalSnackProfit += profit;
+
       const row = wsSnack.addRow([
         String(index + 1),
         formatDateExcel(t.created_at),
         t.snack_name || "-",
-        String(t.quantity || 0),
-        t.price || 0,
-        t.total_price || 0,
+        qty,
+        modalSatuan,
+        jualSatuan,
+        totalJual,
+        profit,
       ]);
       row.eachCell((cell) => {
         cell.style = normalStyle;
       });
+      row.getCell(4).numFmt = '#,##0';
       row.getCell(5).numFmt = '"Rp"#,##0';
       row.getCell(6).numFmt = '"Rp"#,##0';
+      row.getCell(7).numFmt = '"Rp"#,##0';
+      row.getCell(8).numFmt = '"Rp"#,##0';
     });
 
     if (snackTransactions.length > 0) {
@@ -472,22 +527,27 @@ export default function Analytics() {
         "",
         "",
         "",
-        "TOTAL",
         "",
+        "",
+        "TOTAL",
         totalSnack,
+        totalSnackProfit,
       ]);
       totalRow.eachCell((cell) => {
         cell.style = totalStyle;
       });
-      totalRow.getCell(4).numFmt = "@";
-      totalRow.getCell(6).numFmt = '"Rp"#,##0';
+      totalRow.getCell(6).numFmt = "@";
+      totalRow.getCell(7).numFmt = '"Rp"#,##0';
+      totalRow.getCell(8).numFmt = '"Rp"#,##0';
     }
 
     wsSnack.columns = [
       { width: 6 },
       { width: 14 },
       { width: 22 },
-      { width: 12 },
+      { width: 10 },
+      { width: 18 },
+      { width: 18 },
       { width: 16 },
       { width: 16 },
     ];
@@ -501,6 +561,7 @@ export default function Analytics() {
       "No",
       "Snack ID",
       "Nama Snack",
+      "Harga Modal",
       "Harga Jual",
       "Stok Tersedia",
       "Total Nilai Stok",
@@ -516,6 +577,7 @@ export default function Analytics() {
     stockItems.forEach((item, index) => {
       const snack = item.snacks || {};
       const snackName = snack.name || "-";
+      const hargaModal = Number(item.harga_modal || 0);
       const price = Number(snack.price || 0);
       const quantity = Number(item.quantity || 0);
       const totalValue = price * quantity;
@@ -525,6 +587,7 @@ export default function Analytics() {
         String(index + 1),
         item.snack_id || "-",
         snackName,
+        hargaModal,
         price,
         quantity,
         totalValue,
@@ -536,13 +599,15 @@ export default function Analytics() {
       });
 
       row.getCell(4).numFmt = '"Rp"#,##0';
-      row.getCell(5).numFmt = '#,##0';
-      row.getCell(6).numFmt = '"Rp"#,##0';
-      row.getCell(5).value = quantity;
+      row.getCell(5).numFmt = '"Rp"#,##0';
+      row.getCell(6).numFmt = '#,##0';
+      row.getCell(7).numFmt = '"Rp"#,##0';
+      row.getCell(6).value = quantity;
     });
 
     if (stockItems.length > 0) {
       const totalRow = wsStock.addRow([
+        "",
         "",
         "",
         "",
@@ -554,14 +619,15 @@ export default function Analytics() {
       totalRow.eachCell((cell) => {
         cell.style = totalStyle;
       });
-      totalRow.getCell(5).numFmt = '#,##0';
-      totalRow.getCell(6).numFmt = '"Rp"#,##0';
+      totalRow.getCell(6).numFmt = '#,##0';
+      totalRow.getCell(7).numFmt = '"Rp"#,##0';
     }
 
     wsStock.columns = [
       { width: 6 },
       { width: 38 },
       { width: 24 },
+      { width: 14 },
       { width: 14 },
       { width: 16 },
       { width: 18 },
@@ -737,7 +803,7 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={psChartData}
-                margin={{ top: 20, right: 16, left: 0, bottom: 0 }}
+                margin={{ top: 35, right: 16, left: 0, bottom: 0 }}
               >
                 <defs>
                   <linearGradient id="psGradient" x1="0" y1="0" x2="0" y2="1">
@@ -797,7 +863,7 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={snackChartData}
-                margin={{ top: 20, right: 16, left: 0, bottom: 0 }}
+                margin={{ top: 35, right: 16, left: 0, bottom: 0 }}
               >
                 <defs>
                   <linearGradient id="snackGradient" x1="0" y1="0" x2="0" y2="1">
@@ -847,6 +913,86 @@ export default function Analytics() {
                   }}
                 />
               </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      <div className="charts-grid" style={{ marginTop: "24px" }}>
+        <div className="chart-card cyan-border">
+          <h2 className="chart-title">DAILY RENTAL PS</h2>
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={psDailyChartData}
+                margin={{ top: 35, right: 16, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid stroke="rgba(255,255,255,0.07)" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: "#8ab4cc", fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={2}
+                />
+                <YAxis
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: "#8ab4cc", fontSize: 11 }}
+                  tickFormatter={(v) => `${v / 1000}k`}
+                  axisLine={false}
+                  tickLine={false}
+                  width={40}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#00f2fe"
+                  strokeWidth={3}
+                  dot={{ r: 3, fill: "#00f2fe", strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: "#fff", stroke: "#00f2fe", strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="chart-card purple-border">
+          <h2 className="chart-title">DAILY SNACK</h2>
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={snackDailyChartData}
+                margin={{ top: 35, right: 16, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid stroke="rgba(255,255,255,0.07)" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: "#b99acc", fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={2}
+                />
+                <YAxis
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: "#b99acc", fontSize: 11 }}
+                  tickFormatter={(v) => `${v / 1000}k`}
+                  axisLine={false}
+                  tickLine={false}
+                  width={40}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#f0b6ff"
+                  strokeWidth={3}
+                  dot={{ r: 3, fill: "#f0b6ff", strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: "#fff", stroke: "#f0b6ff", strokeWidth: 2 }}
+                />
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>

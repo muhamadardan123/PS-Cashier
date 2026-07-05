@@ -11,6 +11,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import toast, { Toaster } from "react-hot-toast";
 import "./Stock.css";
 
 export default function Stock() {
@@ -45,7 +46,7 @@ export default function Stock() {
       setStockItems(stockData || []);
     } catch (error) {
       console.error("Error fetching stock:", error.message);
-      alert("Gagal memuat data stok: " + error.message);
+      toast.error("Gagal memuat data stok: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -166,7 +167,7 @@ export default function Stock() {
             .single();
 
           if (existingStock) {
-            alert(`Snack "${formData.snack_name}" sudah memiliki stok! Silakan edit stok yang ada.`);
+            toast.error(`Snack "${formData.snack_name}" sudah memiliki stok! Silakan edit stok yang ada.`);
             return;
           }
         } else {
@@ -192,11 +193,12 @@ export default function Stock() {
         if (insertStockError) throw insertStockError;
       }
 
+      toast.success("Data stok berhasil disimpan!");
       resetForm();
       fetchData();
     } catch (error) {
       console.error("Error saving stock:", error.message);
-      alert("Gagal menyimpan: " + error.message);
+      toast.error("Gagal menyimpan: " + error.message);
     }
   };
 
@@ -221,10 +223,11 @@ export default function Stock() {
     try {
       const { error } = await supabase.from("stocks").delete().eq("id", id);
       if (error) throw error;
+      toast.success("Stok berhasil dihapus!");
       fetchData();
     } catch (error) {
       console.error("Error deleting stock:", error.message);
-      alert("Gagal menghapus: " + error.message);
+      toast.error("Gagal menghapus: " + error.message);
     }
   };
 
@@ -252,6 +255,7 @@ export default function Stock() {
 
   return (
     <div className="stock-page">
+      <Toaster position="top-right" />
       <div className="stock-header">
         <h1 className="stock-title">STOCK MANAGEMENT</h1>
         <p className="stock-subtitle">Kelola stok snack & minuman rental PS</p>

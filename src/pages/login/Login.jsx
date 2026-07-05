@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { supabase } from "../../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { Gamepad2, User, Lock, Eye, EyeOff } from "lucide-react"; // Mengganti Mail dengan User icon
@@ -43,7 +44,7 @@ export default function Login() {
       // Jika sukses, arahkan ke dashboard
       navigate("/dashboard");
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

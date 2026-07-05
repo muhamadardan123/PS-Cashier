@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "react-hot-toast";
 import { supabase } from "../../lib/supabase";
 import {
   Bell,
@@ -627,7 +628,7 @@ export default function Dashboard() {
       closeBillingModal();
       fetchDashboardData();
     } catch (error) {
-      alert("Gagal membuka billing: " + error.message);
+      toast.error("Gagal membuka billing: " + error.message);
     }
   };
 
@@ -698,7 +699,7 @@ export default function Dashboard() {
 
       fetchDashboardData();
     } catch (error) {
-      alert("Gagal menghentikan billing: " + error.message);
+      toast.error("Gagal menghentikan billing: " + error.message);
     }
   };
 
@@ -713,7 +714,7 @@ export default function Dashboard() {
 
       if (error) throw error;
 
-      alert(
+      toast.success(
         nextStatus === "paused"
           ? `Billing ${psName} BERHASIL DIJEDA!`
           : `Billing ${psName} DILANJUTKAN KEMBALI!`
@@ -721,7 +722,7 @@ export default function Dashboard() {
 
       fetchDashboardData();
     } catch (error) {
-      alert("Gagal merubah status jeda: " + error.message);
+      toast.error("Gagal merubah status jeda: " + error.message);
     }
   };
 
@@ -746,13 +747,13 @@ export default function Dashboard() {
     const numericValue = parseFloat(value);
 
     if (!numericValue || numericValue <= 0) {
-      alert("Masukkan jumlah waktu yang valid!");
+      toast.error("Masukkan jumlah waktu yang valid!");
       return;
     }
 
     const ps = playstations.find((p) => p.id === psId);
     if (!ps) {
-      alert("Data PlayStation tidak ditemukan!");
+      toast.error("Data PlayStation tidak ditemukan!");
       return;
     }
 
@@ -773,7 +774,7 @@ export default function Dashboard() {
       closeAddTimeModal();
       fetchDashboardData();
     } catch (err) {
-      alert("Gagal menambah waktu: " + err.message);
+      toast.error("Gagal menambah waktu: " + err.message);
     }
   };
 
