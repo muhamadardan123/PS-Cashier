@@ -92,8 +92,7 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState([]);
   const audioRef = useRef(null);
 
-  // State untuk toggle testing mode
-  const [isTestMode, setIsTestMode] = useState(false);
+
 
   const [isBillingModalOpen, setIsBillingModalOpen] = useState(false);
   const [selectedPs, setSelectedPs] = useState(null);
@@ -471,16 +470,10 @@ export default function Dashboard() {
     };
   }, [notifications]);
 
-  // ── Fungsi untuk menghitung durasi (dengan Test Mode) ────────────────
+  // ── Fungsi untuk menghitung durasi ─────────────────────────────────────
   const calculateDuration = useCallback((selectedHours) => {
-    if (isTestMode) {
-      const durationInSeconds = selectedHours * 60;
-      console.log(`🧪 TEST MODE: ${selectedHours} jam = ${durationInSeconds} detik (${durationInSeconds/60} menit)`);
-      return durationInSeconds;
-    } else {
-      return selectedHours * ONE_HOUR_IN_SECONDS;
-    }
-  }, [isTestMode]);
+    return selectedHours * ONE_HOUR_IN_SECONDS;
+  }, []);
 
   // ── Handlers ───────────────────────────────────────────────────────────
   const handleTimeOut = useCallback(
@@ -922,21 +915,6 @@ export default function Dashboard() {
               <h1>PS CASHIER</h1>
               <p>ADMIN DASHBOARD</p>
             </div>
-            
-            <div className="test-mode-toggle">
-              <FlaskConical size={16} className={`test-mode-icon ${isTestMode ? 'active' : ''}`} />
-              <label className="toggle-switch">
-                <input
-                  type="checkbox"
-                  checked={isTestMode}
-                  onChange={() => setIsTestMode(!isTestMode)}
-                />
-                <span className="toggle-slider"></span>
-              </label>
-              <span className="toggle-label">
-                {isTestMode ? '🧪 Testing' : 'Production'}
-              </span>
-            </div>
           </div>
         </header>
 
@@ -1065,11 +1043,6 @@ export default function Dashboard() {
                     <option value="4">4 Jam</option>
                     <option value="5">5 Jam</option>
                   </select>
-                  {isTestMode && (
-                    <small className="test-mode-hint">
-                      🧪 Testing Mode: 1 Jam = 1 Menit
-                    </small>
-                  )}
                 </div>
               )}
 
