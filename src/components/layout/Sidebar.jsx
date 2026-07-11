@@ -70,7 +70,7 @@ export default function Sidebar({ handleLogout }) {
         >
           <LogOut size={22} />
         </button>
-        <span className="version-text">v1.0.0</span>
+        <span className="version-text">v1.0.1</span>
       </div>
     </aside>
   );
