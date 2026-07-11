@@ -97,7 +97,7 @@ export default function Stock() {
   const handlePriceInput = (e) => {
     const rawValue = e.target.value.replace(/[^0-9]/g, ""); // Hanya ambil angka
     const numericValue = rawValue === "" ? "" : parseInt(rawValue, 10);
-    
+
     setFormData((prev) => ({ ...prev, price: numericValue }));
     setDisplayPrice(rawValue === "" ? "" : formatNumber(numericValue));
   };
@@ -105,7 +105,7 @@ export default function Stock() {
   const handleCostPriceInput = (e) => {
     const rawValue = e.target.value.replace(/[^0-9]/g, "");
     const numericValue = rawValue === "" ? "" : parseInt(rawValue, 10);
-    
+
     setFormData((prev) => ({ ...prev, harga_modal: numericValue }));
     setDisplayCostPrice(rawValue === "" ? "" : formatNumber(numericValue));
   };
@@ -124,6 +124,10 @@ export default function Stock() {
 
       if (editingId) {
         // UPDATE existing stock
+        // NOTE: costPrice harus dideklarasikan SEBELUM dipakai di query update,
+        // ini yang sebelumnya menyebabkan error "Cannot access before initialization"
+        const costPrice = parseInt(formData.harga_modal) || 0;
+
         const { error: stockError } = await supabase
           .from("stocks")
           .update({
@@ -134,8 +138,6 @@ export default function Stock() {
           .eq("id", editingId);
 
         if (stockError) throw stockError;
-
-        const costPrice = parseInt(formData.harga_modal) || 0;
 
         // Update harga snack juga
         const stockItem = stockItems.find((s) => s.id === editingId);
