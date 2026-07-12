@@ -9,14 +9,19 @@ import {
   Wallet,
   Boxes,
   AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import "./TransaksiSnack.css";
+
+const ITEMS_PER_PAGE = 6;
 
 export default function TransaksiSnack() {
   const [sales, setSales] = useState([]);
   const [stocks, setStocks] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [form, setForm] = useState({
     itemName: "",
     category: "",
@@ -162,6 +167,50 @@ export default function TransaksiSnack() {
         (item.paymentMethod || "").toLowerCase().includes(keyword)
     );
   }, [sales, search]);
+
+  // ── Pagination ───────────────────────────────────────────────────────
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredSales.length / ITEMS_PER_PAGE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedSales = useMemo(
+    () =>
+      filteredSales.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      ),
+    [filteredSales, currentPage]
+  );
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 3;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      return pages;
+    }
+
+    let start = Math.max(1, currentPage - 1);
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    start = Math.max(1, end - maxVisible + 1);
+
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
 
   const computedTotal = useMemo(() => {
     const quantity = Number(form.quantity) || 0;
@@ -597,13 +646,13 @@ export default function TransaksiSnack() {
             </div>
 
             <div className="snack-list">
-              {filteredSales.length === 0 ? (
+              {paginatedSales.length === 0 ? (
                 <div className="snack-empty-state">
                   <Package2 size={34} />
                   <p>Belum ada data penjualan yang cocok dengan pencarian.</p>
                 </div>
               ) : (
-                filteredSales.map((item) => (
+                paginatedSales.map((item) => (
                   <div key={item.id} className="snack-card">
                     <div className="snack-card-top">
                       <div>
@@ -627,6 +676,78 @@ export default function TransaksiSnack() {
                 ))
               )}
             </div>
+
+            {/* Pagination */}
+            {filteredSales.length > 0 && (
+              <div className="pagination-wrapper">
+                <span className="pagination-info">
+                  Total {formatNumber(filteredSales.length)} data
+                </span>
+
+                <div className="pagination-controls">
+                  <button
+                    type="button"
+                    className="page-btn page-nav"
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    aria-label="Halaman sebelumnya"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  {getPageNumbers()[0] > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        className="page-btn"
+                        onClick={() => goToPage(1)}
+                      >
+                        1
+                      </button>
+                      {getPageNumbers()[0] > 2 && (
+                        <span className="page-ellipsis">...</span>
+                      )}
+                    </>
+                  )}
+
+                  {getPageNumbers().map((page) => (
+                    <button
+                      type="button"
+                      key={page}
+                      className={`page-btn ${page === currentPage ? "page-active" : ""}`}
+                      onClick={() => goToPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+                    <>
+                      {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
+                        <span className="page-ellipsis">...</span>
+                      )}
+                      <button
+                        type="button"
+                        className="page-btn"
+                        onClick={() => goToPage(totalPages)}
+                      >
+                        {totalPages}
+                      </button>
+                    </>
+                  )}
+
+                  <button
+                    type="button"
+                    className="page-btn page-nav"
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    aria-label="Halaman berikutnya"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </div>
