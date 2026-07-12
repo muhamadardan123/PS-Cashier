@@ -374,7 +374,7 @@
 .pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 8px;
   margin-top: 20px;
   flex-wrap: wrap;

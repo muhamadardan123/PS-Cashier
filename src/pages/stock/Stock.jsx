@@ -16,7 +16,7 @@ import { supabase } from "../../lib/supabase";
 import toast, { Toaster } from "react-hot-toast";
 import "./Stock.css";
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 5;
 
 export default function Stock() {
   const [stockItems, setStockItems] = useState([]);
