@@ -16,7 +16,7 @@ import {
 import "./TransaksiPS.css";
 
 const PRICE_PER_HOUR = 15000;
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 3;
 
 // 🔥 UPDATE: Semua 6 TV
 const stationOptions = [
