@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import "./TransaksiSnack.css";
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 3;
 
 export default function TransaksiSnack() {
   const [sales, setSales] = useState([]);
