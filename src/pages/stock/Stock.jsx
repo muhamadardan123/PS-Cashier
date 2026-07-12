@@ -9,10 +9,14 @@ import {
   X,
   Save,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import toast, { Toaster } from "react-hot-toast";
 import "./Stock.css";
+
+const ITEMS_PER_PAGE = 8;
 
 export default function Stock() {
   const [stockItems, setStockItems] = useState([]);
@@ -20,6 +24,7 @@ export default function Stock() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [formData, setFormData] = useState({
     snack_name: "",
@@ -61,6 +66,48 @@ export default function Stock() {
     const snackName = item.snacks?.name?.toLowerCase() || "";
     return snackName.includes(searchQuery.toLowerCase());
   });
+
+  // ── Reset ke halaman 1 setiap kali pencarian berubah ──
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // ── Pagination ──
+  const totalPages = Math.max(1, Math.ceil(filteredStock.length / ITEMS_PER_PAGE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedStock = filteredStock.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  // Menghasilkan daftar nomor halaman yang ditampilkan (maks 3 nomor + ellipsis sederhana)
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 3;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      return pages;
+    }
+
+    let start = Math.max(1, currentPage - 1);
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    start = Math.max(1, end - maxVisible + 1);
+
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
 
   const lowStockCount = stockItems.filter((item) => (item.quantity || 0) <= 5).length;
   const totalItems = stockItems.length;
@@ -334,7 +381,7 @@ export default function Stock() {
             </tr>
           </thead>
           <tbody>
-            {filteredStock.length === 0 ? (
+            {paginatedStock.length === 0 ? (
               <tr>
                 <td colSpan="8" className="empty-state">
                   {searchQuery
@@ -343,14 +390,15 @@ export default function Stock() {
                 </td>
               </tr>
             ) : (
-              filteredStock.map((item, index) => {
+              paginatedStock.map((item, index) => {
                 const snack = item.snacks || {};
                 const qty = item.quantity || 0;
                 const isLow = qty <= 5;
+                const rowNumber = (currentPage - 1) * ITEMS_PER_PAGE + index + 1;
 
                 return (
                   <tr key={item.id} className={isLow ? "row-low-stock" : ""}>
-                    <td>{formatNumber(index + 1)}</td>
+                    <td>{formatNumber(rowNumber)}</td>
                     <td>
                       <div className="item-name">{snack.name || "-"}</div>
                     </td>
@@ -397,6 +445,59 @@ export default function Stock() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {filteredStock.length > 0 && (
+        <div className="pagination">
+          <button
+            className="pagination-arrow"
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            aria-label="Halaman sebelumnya"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          {getPageNumbers()[0] > 1 && (
+            <>
+              <button className="pagination-btn" onClick={() => goToPage(1)}>
+                1
+              </button>
+              {getPageNumbers()[0] > 2 && <span className="pagination-ellipsis">...</span>}
+            </>
+          )}
+
+          {getPageNumbers().map((page) => (
+            <button
+              key={page}
+              className={`pagination-btn ${page === currentPage ? "active" : ""}`}
+              onClick={() => goToPage(page)}
+            >
+              {page}
+            </button>
+          ))}
+
+          {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+            <>
+              {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
+                <span className="pagination-ellipsis">...</span>
+              )}
+              <button className="pagination-btn" onClick={() => goToPage(totalPages)}>
+                {totalPages}
+              </button>
+            </>
+          )}
+
+          <button
+            className="pagination-arrow"
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            aria-label="Halaman berikutnya"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
 
       {/* Modal Form */}
       {showModal && (
